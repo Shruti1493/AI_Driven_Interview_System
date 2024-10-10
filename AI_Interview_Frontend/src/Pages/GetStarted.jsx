@@ -29,7 +29,7 @@ const GetStarted = () => {
 
         if (timeLeft === 0) {
             clearInterval(timer);
-            navigate("/s");
+            navigate("/start");
         }
 
         return () => clearInterval(timer);

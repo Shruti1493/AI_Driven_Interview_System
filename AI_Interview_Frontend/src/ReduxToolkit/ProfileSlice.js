@@ -25,6 +25,8 @@ const ProfileSlice = createSlice({
         RemoveProfileData: (state, action) => {        
             state.userData = null;
             localStorage.removeItem('userData')
+            console.log("remove data from store ",state.userData)
+            console.log("remove data from localstorage ", userData)
         }
     }
 
