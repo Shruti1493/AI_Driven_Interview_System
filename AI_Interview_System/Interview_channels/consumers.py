@@ -6,16 +6,16 @@ import requests
 class InterviewConsumer(WebsocketConsumer):
     function_called = True   
     # questions = [] 
-    questions = ["1. You mentioned working on an ML solution for anomaly detection in your internship at General Mills. Can you elaborate on the two key indicators you used to categorize anomalies and the methodology you employed to ensure the accuracy of your model?",
+    questions = ["1. You mentioned working on an ML solution for anomaly detection in your  model?",
 
-        "2.  Can you describe a project where you utilized Python extensively and explain the specific problem you were trying to solve? What was your role, and how did you approach the problem?",
+        "2.  Can you describe a project where you utiach the problem?",
 
 
-        "3. In your DressMeAI project, you implemented a Search Recommendation System using TF-IDF. How did you optimize the search process to improve the system's efficiency and accuracy? What were the challenges you encountered, and how did you overcome them?",
+        "3. In your DressMeAI project,s you encountered, and how did you overcome them?",
 
-        "4. During your AWS Cloud internship, you managed pipelines with CodePipeline, CodeBuild, and CodeDeploy. How did these tools help improve deployment efficiency, and can you provide an example of a deployment issue you faced and how you resolved it?",
+        "4. During your AWS Cloud internship,f a deployment issue you faced and how you resolved it?",
 
-        "5. You have experience working with libraries like Pandas and Numpy. Can you discuss a time when you leveraged these libraries to analyze large datasets and extract meaningful insights for better decision-making?"]
+        "5. You have experience working with libraries l insights for better decision-making?"]
     # questions =  ['1. Can you describe a project you have worked on using Python where you had to conduct exhaustive research to identify and integrate relevant APIs? What challenges did you face during the process, and how did you overcome them?', '2. In your experience, how do you approach testing and debugging Python code, especially when dealing with complex libraries and frameworks? Can you provide an example of a time when your debugging skills were put to the test, and how you managed to find and fix the issue?', '3. You have worked on a couple of projects using the MERN stack. Can you explain how you approach frontend-backend integration in a MERN stack project and provide an example of a time when you faced a challenge during the integration process? How did you resolve the issue?', '4. You have experience working with Django Rest Framework. Can you discuss a time when you designed and implemented REST APIs, and what specific design considerations did you keep in mind to ensure scalability and maintainability of the APIs over time?', '5. You have experience working with AWS. Can you explain a situation where you had to manage the deployment of both the frontend and backend components on AWS, and what specific services or tools did you use to ensure a smooth deployment process?'] 
      
     videoResults = []
@@ -82,7 +82,7 @@ class InterviewConsumer(WebsocketConsumer):
  
 
     def receive(self, text_data):
-        print("Received message") 
+        print("Received message", text_data) 
         python_data = json.loads(text_data)
          
         mess = python_data.get('client_mess', '')  # Get the client message
@@ -100,7 +100,7 @@ class InterviewConsumer(WebsocketConsumer):
        
         # Load questions if they haven't been loaded yet
         if self.function_called:
-            self.call_function_once(mess)  # Use the client message as the topic
+            # self.call_function_once(mess)  # Use the client message as the topic
             self.function_called = False  # Prevent multiple calls
             print("Questions loaded, sending first question...")  # Debug print
         
