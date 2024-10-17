@@ -13,6 +13,7 @@ import {
 } from "./ImportStatements.js";
 import ToogleForm from "./Components/FormComponents/ToggleForm.jsx";
 import StartInterview from "./Pages/StartInterview.jsx";
+import InterviewResult from "./Pages/InterviewResult.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
     <React.StrictMode>
@@ -27,6 +28,8 @@ ReactDOM.createRoot(document.getElementById("root")).render(
                     <Route path="/get-started" element={<GetStarted />} />
                     <Route path="/s" element={<Channels />} />
                     <Route path="/start" element={<StartInterview />} />
+                    <Route path="/result" element={<InterviewResult />} />
+
                 </Routes>
             </BrowserRouter>
         </Provider>

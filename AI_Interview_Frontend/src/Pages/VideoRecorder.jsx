@@ -1,5 +1,3 @@
-
-
 import React, {
     useState,
     useEffect,
@@ -10,13 +8,9 @@ import React, {
 import { useReactMediaRecorder } from "react-media-recorder";
 
 const VideoRecorder = forwardRef((props, ref) => {
-    const { onUploadResponse } = props;
-
     const [recordingStatus, setRecordingStatus] = useState(null);
     const [mediaBlobUrl, setMediaBlobUrl] = useState("");
     const videoRef = useRef(null);
-
-   
 
     const { startRecording, stopRecording } = useReactMediaRecorder({
         video: true,
@@ -35,19 +29,8 @@ const VideoRecorder = forwardRef((props, ref) => {
         },
         stopAndUpload: async () => {
             stopRecording();
-            console.log("Shruti Video Stopandupload chal raha hai");
+
             setRecordingStatus("video status -> stopped and uploading...");
-            // console.log("mediaBlobUrl ttttttttttttis ", mediaBlobUrl);
-
-            // const responseData = await uploadVideo();
-            // console.log(
-            //     "Shruti Video upload response aa gaya hai",
-            //     responseData
-            // );
-
-            // if (responseData) {
-            //     onUploadResponse(responseData);
-            // }
         },
     }));
 
@@ -61,7 +44,6 @@ const VideoRecorder = forwardRef((props, ref) => {
                     videoRef.current.srcObject = stream;
                 }
             } catch (err) {
-                console.error("Error accessing user media:", err);
                 setRecordingStatus("Failed to access camera.");
             }
         };
@@ -72,30 +54,45 @@ const VideoRecorder = forwardRef((props, ref) => {
     useEffect(() => {
         const uploadAndHandleResponse = async () => {
             if (mediaBlobUrl) {
-                console.log("mediaBlobUrl is available:", mediaBlobUrl);
-    
-                // Upload the video
-                const responseData = await uploadVideo(mediaBlobUrl);
-                console.log("Shruti Video upload response aa gaya hai", responseData);
+                await uploadVideo(mediaBlobUrl);
             }
         };
-    
+
         uploadAndHandleResponse();
     }, [mediaBlobUrl]);
-    
 
     const uploadVideo = async (url) => {
         if (url) {
-            console.log("mediaBlobUrl is ", url);
-            const videoBlob = await fetch(url).then((res) =>
-                res.blob()
-            );
+            const videoBlob = await fetch(url).then((res) => res.blob());
             const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
             const fileName = `shruti-${timestamp}.mp4`;
             const formData = new FormData();
             formData.append("video", videoBlob, fileName);
 
             try {
+                let responseData = {
+                    audio: "hello hello hello hello hello",
+                    video: {
+                        "Average Emotion Scores": {
+                            Angry: 0.14491591606845802,
+                            Disgust: 0.0033770028948593195,
+                            Fear: 0.08049754124006321,
+                            Happy: 0.04807277722284198,
+                            Sad: 0.3077522315855684,
+                            Surprise: 0.06091196170804658,
+                            Neutral: 0.35447256446912373,
+                        },
+                        "Top Three Emotions": {
+                            Neutral: 0.35447256446912373,
+                            Sad: 0.3077522315855684,
+                            Angry: 0.14491591606845802,
+                        },
+                        "Mean Stress Level": 45.27147238423254,
+                    },
+                };
+
+                props.func(responseData);
+
                 const response = await fetch(
                     "http://localhost:8000/interview/upload_video/",
                     {
@@ -107,6 +104,7 @@ const VideoRecorder = forwardRef((props, ref) => {
                 if (response.ok) {
                     const responseData = await response.json();
                     setRecordingStatus("Upload successful!");
+
                     return responseData;
                 } else {
                     const errorMessage = await response.text();
@@ -129,9 +127,8 @@ const VideoRecorder = forwardRef((props, ref) => {
         <div className="flex flex-col items-center justify-center min-h-     bg-gray-100  ">
             <div className="text-center mb-4">
                 <h1 className="text-3xl font-bold text-gray-800">
-                {recordingStatus}
+                    {recordingStatus}
                 </h1>
-                
             </div>
             <div className="flex flex-col items-center">
                 <div className="w-full mb-5 max-h-89 bg-black relative  rounded-lg overflow-hidden">

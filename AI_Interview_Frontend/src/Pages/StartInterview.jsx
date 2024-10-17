@@ -1,8 +1,8 @@
-
 import { useEffect, useState, useRef } from "react";
 import { Button } from "@material-tailwind/react";
 import TImer from "./TImer";
 import VideoRecorder from "./VideoRecorder";
+import { useNavigate } from "react-router-dom";
 
 const StartInterview = () => {
     const ws = useRef(null);
@@ -11,9 +11,12 @@ const StartInterview = () => {
     const [startVideo, setStartVideo] = useState(false);
     const [questionIndex, setQuestionIndex] = useState(0);
     const [showScreen, setShowScreen] = useState(false);
-    const [spokenWords, setSpokenWords] = useState(""); // To keep track of spoken words
+    const [spokenWords, setSpokenWords] = useState("");
+    const [apiresult, setApiResult] = useState(null);
+    const [finalResult, setFinalResult] = useState(null);
     const videoRecorderRef = useRef(null);
-    
+    const navigate = useNavigate();
+
 
     const WebSocketUrl = "ws://127.0.0.1:8000/ws/sc/";
 
@@ -30,10 +33,18 @@ const StartInterview = () => {
 
         ws.current.onmessage = (e) => {
             const jsObjQuestion = JSON.parse(e.data);
-            console.log("Received question:", jsObjQuestion);
-            setQuestion(jsObjQuestion["question"]);
-            setStartTimer(false);
-            setQuestionIndex((prev) => prev + 1);
+            if (jsObjQuestion["question"]) {
+                setQuestion(jsObjQuestion["question"]);
+                setStartTimer(false);
+                setQuestionIndex((prev) => prev + 1);
+            }
+            if (jsObjQuestion['FinalResult']) {
+                setFinalResult(jsObjQuestion['FinalResult']);
+                console.log("Start Intervurw ",jsObjQuestion['FinalResult']);
+                navigate("/result", { state: { finalResult: jsObjQuestion['FinalResult'] } }); // Pass result in navigate
+                ws.current.close();
+            }
+            
         };
 
         ws.current.onclose = () => {
@@ -92,8 +103,6 @@ const StartInterview = () => {
     }, [question]);
 
     const handleNextButton = () => {
-        console.log("Next Button Clicked");
-        
         if (ws.current && ws.current.readyState === WebSocket.OPEN) {
             ws.current.send(
                 JSON.stringify({ client_mess: "Send Next Question pls" })
@@ -102,7 +111,7 @@ const StartInterview = () => {
         if (videoRecorderRef.current) {
             // Stop the current recording and upload it
             videoRecorderRef.current.stopAndUpload();
-            console.log("Video stopped yeah..");
+
             setStartVideo(false);
         }
     };
@@ -115,21 +124,43 @@ const StartInterview = () => {
 
     useEffect(() => {
         if (startVideo) {
-            console.log("Video started yeah..");
             setStartVideo(true);
             handleStartRecording();
         }
     }, [startVideo]);
 
+    const SendResult = (data) => {
+        if (data) {
+            setApiResult(data);
+        }
+    };
+
+    const UploadResult = async (data) => {
+        if (data) {
+            if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+                ws.current.send(JSON.stringify({ result: data }));
+            }
+        }
+    };
+    useEffect(() => {
+        if (apiresult) {
+            UploadResult(apiresult);
+        }
+    }, [apiresult]);
+
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
-            <h1 className="text-4xl font-bold text-cyan-800 mb-8">Interview Session</h1>
+            <h1 className="text-4xl font-bold text-cyan-800 mb-8">
+                Interview Session
+            </h1>
             <div className="bg-white shadow-lg rounded-lg p-6 mb-6 w-full max-w-6xl">
                 {question ? (
                     <>
                         {/* <h2 className="text-xl font-semibold text-gray-700 mb-4">Current Question:</h2> */}
                         {spokenWords && (
-                            <h1 className="max-w-6xl text-3xl font-semibold leading-relaxed text-gray-900 dark:text-slate-900">{spokenWords}</h1>
+                            <h1 className="max-w-6xl text-3xl font-semibold leading-relaxed text-gray-900 dark:text-slate-900">
+                                {spokenWords}
+                            </h1>
                         )}
                         {startTimer && (
                             <TImer
@@ -143,7 +174,9 @@ const StartInterview = () => {
                         )}
                     </>
                 ) : (
-                    <h2 className="text-xl font-semibold text-gray-700 mb-4">Waiting for questions...</h2>
+                    <h2 className="text-xl font-semibold text-gray-700 mb-4">
+                        Waiting for questions...
+                    </h2>
                 )}
             </div>
 
@@ -152,15 +185,14 @@ const StartInterview = () => {
                     className=" text-white bg-yellow-500 hover:bg-cyan-800 transition duration-200 mb-4"
                     onClick={handleNextButton}
                     variant="filled"
-                    
                 >
                     Next Question
                 </Button>
             )}
 
-            {!startTimer &&  (
+            {!startTimer && (
                 <div className="mt-2 bg-white rounded-lg shadow-md p-4 w-full max-w-xl">
-                    <VideoRecorder ref={videoRecorderRef} />
+                    <VideoRecorder ref={videoRecorderRef} func={SendResult} />
                 </div>
             )}
         </div>
