@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 const StartInterview = () => {
     const ws = useRef(null);
     const [question, setQuestion] = useState(null);
+   
     const [startTimer, setStartTimer] = useState(false);
     const [startVideo, setStartVideo] = useState(false);
     const [questionIndex, setQuestionIndex] = useState(0);
@@ -34,6 +35,8 @@ const StartInterview = () => {
         ws.current.onmessage = (e) => {
             const jsObjQuestion = JSON.parse(e.data);
             if (jsObjQuestion["question"]) {
+               
+                
                 setQuestion(jsObjQuestion["question"]);
                 setStartTimer(false);
                 setQuestionIndex((prev) => prev + 1);
@@ -110,7 +113,7 @@ const StartInterview = () => {
         }
         if (videoRecorderRef.current) {
             // Stop the current recording and upload it
-            videoRecorderRef.current.stopAndUpload();
+            videoRecorderRef.current.stopAndUpload(question);
 
             setStartVideo(false);
         }

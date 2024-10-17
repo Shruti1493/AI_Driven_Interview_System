@@ -106,6 +106,15 @@ REST_FRAMEWORK = {
 #     }
 # }
 
+# DATABASES = {
+#         'default': {
+#             'ENGINE': 'djongo',
+#             'NAME': 'AI_Interview_DB',
+             
+            
+#         }
+# }
+
 DATABASES = {
         'default': {
             'ENGINE': 'djongo',

@@ -10,6 +10,7 @@ import { useReactMediaRecorder } from "react-media-recorder";
 const VideoRecorder = forwardRef((props, ref) => {
     const [recordingStatus, setRecordingStatus] = useState(null);
     const [mediaBlobUrl, setMediaBlobUrl] = useState("");
+    const [question, setQuestion] = useState(null);
     const videoRef = useRef(null);
 
     const { startRecording, stopRecording } = useReactMediaRecorder({
@@ -27,8 +28,10 @@ const VideoRecorder = forwardRef((props, ref) => {
             startRecording();
             setRecordingStatus("Answer Recording Started...");
         },
-        stopAndUpload: async () => {
+        stopAndUpload: async (ques) => {
             stopRecording();
+            console.log("from stop ans uploaf",ques)
+            setQuestion(ques);
 
             setRecordingStatus("video status -> stopped and uploading...");
         },
@@ -68,7 +71,8 @@ const VideoRecorder = forwardRef((props, ref) => {
             const fileName = `shruti-${timestamp}.mp4`;
             const formData = new FormData();
             formData.append("video", videoBlob, fileName);
-
+            console.log("Ques from prop ",question)
+            formData.append("question",question);
             try {
                 let responseData = {
                     audio: "hello hello hello hello hello",

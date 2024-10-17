@@ -3,37 +3,37 @@ from channels.generic.websocket import WebsocketConsumer
 import json
 import requests
 import os
+from .rag import QueryInput,generateQuestions
+
+
 
 class InterviewConsumer(WebsocketConsumer):
     function_called = True
-    questions = [
-        "1. You mentioned working on an ML model?",
-        "2. Can you describe a project where you implemented machine learning?",
-       
-    ]
-    
-    #  "3. In your DressMeAI project, what challenges did you encounter, and how did you overcome them?",
+   
     videoResults = []
+    questions = []
     current_question_index = 0
 
     def connect(self):
         self.accept()
 
+    
+
     def call_function_once(self, topic):
-        fastapi_url = 'http://localhost:8001/rag'
-        try:
-            payload = {'topic': topic, 'file': "My-Resume/Mahek_Gupta_Resume.pdf"}
-            response = requests.post(fastapi_url, json=payload)
-            response.raise_for_status()
-            answer = response.json().get('answer', '')
+        
+        file_path = r"C:\Users\91937\Desktop\Major_Project_MONGODB\AI-Interview-Bot\My-Resume\New_Resume_of_Shruti (2).pdf"
 
-            if answer:
-                print("Extracted Questions:", self.questions)
-            else:
-                self.questions = []
+        input_data = QueryInput(topic=topic, file=file_path)
 
-        except requests.exceptions.RequestException as e:
-            self.send(text_data=json.dumps({'error': str(e)}))
+        ques = generateQuestions(input_data)
+        
+        print(ques)
+
+        if ques:
+            self.questions = [q.strip() for q in ques['answer'].split('\n') if q.strip()]
+            print("Extracted Questions:", self.questions)
+        else:
+            self.questions = ["No questions generated"]
 
 
 
@@ -67,6 +67,7 @@ class InterviewConsumer(WebsocketConsumer):
                 print(i, " => ", res)
 
         if self.function_called:
+            self.call_function_once(mess)  
             self.function_called = False
 
         if mess:

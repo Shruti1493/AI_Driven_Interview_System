@@ -43,6 +43,35 @@ class RAGAPIView(APIView):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import os
 import subprocess
 import requests
@@ -51,6 +80,9 @@ from rest_framework.response import Response
 from rest_framework import status
 from moviepy.editor import VideoFileClip
 import speech_recognition as sr
+from .assessment_ans import evaluate, EvaluationInput
+
+
 
 def convert_video_to_audio_moviepy(video_file, output_file):
     clip = VideoFileClip(video_file)
@@ -71,6 +103,9 @@ def convert_audio_to_text(audio_file):
 class VideoUploadView(APIView):
     def post(self, request):
         video_file = request.FILES.get('video')
+        Clientquestion = request.POST.get('question')
+        print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+        print("Question reveived form client is ",Clientquestion)
 
         if video_file:
             # Define file paths
@@ -107,11 +142,33 @@ class VideoUploadView(APIView):
                 files = {'file': mp4_file}
                 response = requests.post("http://127.0.0.1:8002/upload_video/", files=files)
 
+            
+
+            # Create the input data for evaluation
+            input_data = EvaluationInput(
+                # question="Explain the time complexity of merge sort.",
+                # candidate_answer="Merge sort has a time complexity of O(n log n) in all cases."
+                question = Clientquestion,
+                candidate_answer = audio_text
+
+            )
+
+            # Initialize evaluation_result
+            evaluation = None
+            try:
+                evaluation = evaluate(input_data)
+                print("Eval res ",evaluation)
+            except Exception as e:
+                return Response({"error": f"Evaluation failed: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
             # Create the response dictionary
             result_dict = {
                 "audio": audio_text,
-                "video": response.json() if response.status_code == 200 else {}
+                "video": response.json() if response.status_code == 200 else {},
+                "evaluation_result": evaluation
             }
+
+
 
             # Return the response
             if response.status_code == 200:
