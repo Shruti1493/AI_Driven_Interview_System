@@ -8,7 +8,5 @@ import Navbar from "./Components/StyleComponents/Navbar";
 import SignUpToogleForm from "./Components/FormComponents/SignUpToogleForm";
 import UploadResume from "./Pages/UploadResume";
 import GetStarted from "./Pages/GetStarted";
-import Channels from "./Pages/Channels";
-import VideoRecorder from "./Pages/VideoRecorder";
 
-export {GetStarted,Channels, Login, Input, LoginPage, Button, RequestApi, ToggleForm, Navbar, SignUpToogleForm, UploadResume,VideoRecorder };
+export {GetStarted, Login, Input, LoginPage, Button, RequestApi, ToggleForm, Navbar, SignUpToogleForm, UploadResume };

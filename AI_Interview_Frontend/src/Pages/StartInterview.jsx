@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { Button } from "@material-tailwind/react";
-import TImer from "./TImer";
-import VideoRecorder from "./VideoRecorder";
+import TImer from "../Components/InterviewComponents/TImer";
+import VideoRecorder from "../Components/InterviewComponents/VideoRecorder";
 import { useNavigate } from "react-router-dom";
 
 const StartInterview = () => {

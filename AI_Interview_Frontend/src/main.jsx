@@ -6,7 +6,7 @@ import store from "./ReduxToolkit/Store.js";
 import { Provider } from "react-redux";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import {
-    Channels,
+   
     Login,
     UploadResume,
     GetStarted,
@@ -26,7 +26,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
                     <Route path="/login" element={<ToogleForm />} />
                     <Route path="/upload-resume" element={<UploadResume />} />
                     <Route path="/get-started" element={<GetStarted />} />
-                    <Route path="/s" element={<Channels />} />
+                    
                     <Route path="/start" element={<StartInterview />} />
                     <Route path="/result" element={<InterviewResult />} />
 
