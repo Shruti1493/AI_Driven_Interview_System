@@ -86,7 +86,8 @@ def generateQuestions(input: QueryInput):
     query = {"input": input.topic}
     filePath = input.file
 
-    print(filePath)
+
+    print("File path is ",filePath)
 
     texts = ProccessPdf(filePath)
     embed_model = embedModel()
@@ -96,7 +97,7 @@ def generateQuestions(input: QueryInput):
 
     result = rag_chain.invoke(query)
     print("Generated Questions:")
-    print(result['answer'])
+    print("Question genetaye ",result['answer'])
     return {"answer": result['answer']}
 
 

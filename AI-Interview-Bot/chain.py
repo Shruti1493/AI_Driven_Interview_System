@@ -127,7 +127,7 @@ app = FastAPI(
 @app.post("/rag")
 async def rag_query(input: QueryInput):
     query = {"input":  input.topic}
-    filePath =  input.file
+    filePath =  "/My-Resume/Shruti Kedari SDE.pdf"
 
     print(filePath)
 

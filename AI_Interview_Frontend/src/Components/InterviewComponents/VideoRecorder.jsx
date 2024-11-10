@@ -95,7 +95,7 @@ const VideoRecorder = forwardRef((props, ref) => {
                     },
                 };
 
-                props.func(responseData);
+                // props.func(responseData);
 
                 const response = await fetch(
                     "http://localhost:8000/interview/upload_video/",
@@ -108,6 +108,9 @@ const VideoRecorder = forwardRef((props, ref) => {
                 if (response.ok) {
                     const responseData = await response.json();
                     setRecordingStatus("Upload successful!");
+                    console.log("ANsert result received ",responseData)
+                    props.func(responseData);
+
 
                     return responseData;
                 } else {

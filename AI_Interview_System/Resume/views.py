@@ -36,6 +36,7 @@ class ResumeParseView(APIView):
         print("hey")
         print(request.data)
         file = request.data.get('resume')
+
         if not file:
             return Response({'error': 'No file uploaded'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -52,65 +53,10 @@ class ResumeParseView(APIView):
             print("Extracted resume data:", resume_data)
             filtered_skills = [skill for skill in resume_data.get('skills', []) if skill.lower() in SKILLS_LIST]
             resume_data['skills'] = filtered_skills
+            resume_data['file_path'] = file_path
             return Response(resume_data, status=status.HTTP_200_OK)
         except Exception as e:
             print("Exception details:", str(e))
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response({"msg":"hey"})
-
-
-# views.py
-
-from rest_framework import status
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from .models import ExampleModel
-from .serializers import ExampleModelSerializer
-
-class ExampleModelCreateAPIView(APIView):
-    
-    def post(self, request, *args, **kwargs):
-        serializer = ExampleModelSerializer(data=request.data)
-        print(serializer)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-# views.py
-import threading
-from concurrent.futures import ThreadPoolExecutor
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.parsers import MultiPartParser
-
-# Create a thread pool with a limit on the number of concurrent tasks
-executor = ThreadPoolExecutor(max_workers=5)
-
-# This function simulates video processing
-def process_video(file, file_name):
-    print(f"Processing video file: {file_name}")
-    # Simulate a long-running video processing task
-    # You can replace this with your actual video processing logic
-    # For example, analyzing the video, extracting frames, etc.
-    time.sleep(10)  # Simulate video processing delay
-    print(f"Completed processing for file: {file_name}")
-
-class UploadMultipleVideosAPIView(APIView):
-     
-    def post(self, request, *args, **kwargs):
-        # Extract multiple video files from the request
-        video_file = "sjsjs"  # 'videos' is the key for the multiple files
-
-        if not video_file:
-            return Response({"error": "No video uploaded"}, status=400)
-
-        # Submit each video processing task to the thread pool
-        
-        file_name = video_file
-        # Submitting the task to the thread pool for parallel processing
-        executor.submit(process_video, video_file, file_name)
-
-        return Response({"message": "Video is being processed in the background."})

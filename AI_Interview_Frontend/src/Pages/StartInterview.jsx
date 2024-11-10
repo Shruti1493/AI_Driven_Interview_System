@@ -3,11 +3,12 @@ import { Button } from "@material-tailwind/react";
 import TImer from "../Components/InterviewComponents/TImer";
 import VideoRecorder from "../Components/InterviewComponents/VideoRecorder";
 import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 const StartInterview = () => {
     const ws = useRef(null);
     const [question, setQuestion] = useState(null);
-   
+
     const [startTimer, setStartTimer] = useState(false);
     const [startVideo, setStartVideo] = useState(false);
     const [questionIndex, setQuestionIndex] = useState(0);
@@ -17,39 +18,57 @@ const StartInterview = () => {
     const [finalResult, setFinalResult] = useState(null);
     const videoRecorderRef = useRef(null);
     const navigate = useNavigate();
-
+    const location = useLocation();
+    // const [file_p, setfile_p] = useState(location.state?.file_path || []);
 
     const WebSocketUrl = "ws://127.0.0.1:8000/ws/sc/";
 
     useEffect(() => {
         console.log("Connecting to WebSocket...");
+
         ws.current = new WebSocket(WebSocketUrl);
 
         ws.current.onopen = () => {
             console.log("Connection established");
-            ws.current.send(
-                JSON.stringify({ client_mess: "Connection accepted by client" })
-            );
         };
+
+        // ws.current.onmessage = (e) => {
+        //     const jsObjQuestion = JSON.parse(e.data);
+        //     if (jsObjQuestion["question"]) {
+        //         setQuestion(jsObjQuestion["question"]);
+        //         setStartTimer(false);
+        //         setQuestionIndex((prev) => prev + 1);
+        //     }
+        //     if (jsObjQuestion["FinalResult"]) {
+        //         setFinalResult(jsObjQuestion["FinalResult"]);
+        //         console.log("Start Intervurw ", jsObjQuestion["FinalResult"]);
+        //         navigate("/result", {
+        //             state: { finalResult: jsObjQuestion["FinalResult"] },
+        //         }); // Pass result in navigate
+        //         ws.current.close();
+        //     }
+        // };
 
         ws.current.onmessage = (e) => {
             const jsObjQuestion = JSON.parse(e.data);
             if (jsObjQuestion["question"]) {
-               
-                
                 setQuestion(jsObjQuestion["question"]);
                 setStartTimer(false);
                 setQuestionIndex((prev) => prev + 1);
             }
-            if (jsObjQuestion['FinalResult']) {
-                setFinalResult(jsObjQuestion['FinalResult']);
-                console.log("Start Intervurw ",jsObjQuestion['FinalResult']);
-                navigate("/result", { state: { finalResult: jsObjQuestion['FinalResult'] } }); // Pass result in navigate
-                ws.current.close();
+            if (jsObjQuestion["FinalResult"]) {
+                setFinalResult(jsObjQuestion["FinalResult"]);
+                console.log("Received FinalResult", jsObjQuestion["FinalResult"]);
+                // Wait a bit before navigating away, allowing time for all data
+                setTimeout(() => {
+                    navigate("/result", {
+                        state: { finalResult: jsObjQuestion["FinalResult"] },
+                    });
+                    ws.current.close();
+                }, 2000);  
             }
-            
         };
-
+        
         ws.current.onclose = () => {
             console.log("Connection closed");
         };
@@ -61,6 +80,18 @@ const StartInterview = () => {
         };
     }, []);
 
+    const SendResumepath = () => {
+        if (location.state) {
+            console.log(location.state?.file_path);
+            ws.current.send(
+                JSON.stringify({ resume: location.state?.file_path })
+            );
+        }
+    };
+
+    const handleStartButton = () => {
+        SendResumepath();
+    };
     useEffect(() => {
         if (question) {
             const words = question.split(" ");
@@ -156,6 +187,16 @@ const StartInterview = () => {
             <h1 className="text-4xl font-bold text-cyan-800 mb-8">
                 Interview Session
             </h1>
+            {!question && (
+                <Button
+                    className=" text-white bg-yellow-500 hover:bg-cyan-800 transition duration-200 mb-4"
+                    onClick={handleStartButton}
+                    variant="filled"
+                >
+                    Start Interview Question
+                </Button>
+            )}
+
             <div className="bg-white shadow-lg rounded-lg p-6 mb-6 w-full max-w-6xl">
                 {question ? (
                     <>

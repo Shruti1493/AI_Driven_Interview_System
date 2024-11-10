@@ -29,7 +29,7 @@ const GetStarted = () => {
 
         if (timeLeft === 0) {
             clearInterval(timer);
-            navigate("/start");
+            navigate("/upload-resume");
         }
 
         return () => clearInterval(timer);
