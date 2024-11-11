@@ -19,8 +19,8 @@ function App() {
                             improve your skills with our AI-driven platform.
                         </p>
                         <Link
-                            // to="/upload-resume"
-                            to="/get-started"
+                            to="/upload-resume"
+                            // to="/get-started"
                             className="bg-yellow-500 text-gray-800 px-6 py-3 rounded-lg font-semibold hover:bg-yellow-600 transition duration-300"
                         >
                             Get Started

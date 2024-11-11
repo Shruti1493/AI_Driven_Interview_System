@@ -16,6 +16,11 @@ class InterviewConsumer(WebsocketConsumer):
     current_question_index = 0
 
     def connect(self):
+        self.videoResults = []
+        self.questions = []
+        print("Wile connectinh")
+        print(len(self.videoResults))
+        print(len(self.questions))
         
         self.accept()
 
@@ -38,6 +43,8 @@ class InterviewConsumer(WebsocketConsumer):
         if ques:
             self.questions = [q.strip() for q in ques['answer'].split('\n') if q.strip()]
             print("Extracted Questions:", self.questions)
+            self.videoResults = []
+
         else:
             self.questions = ["No questions generated"]
 
@@ -52,28 +59,7 @@ class InterviewConsumer(WebsocketConsumer):
             question = self.questions[self.current_question_index]
             self.send(text_data=json.dumps({'question': question, 'result': self.videoResults}))
             self.current_question_index += 1
-        # else:
-         
-        #     print("Before    loop ")
-        #     print(len(self.videoResults))
-        #     print(len(self.questions))
-        #     while len(self.videoResults) < len(self.questions):
-        #         print("Inside loop")
-        #         print("------------------***************")
-        #         print(len(self.videoResults))
-        #         print(len(self.questions))
-        #         time.sleep(0.1)  # Short pause before re-checking the condition
-            
-        #     print("Outside loop ")
-        #     print(len(self.videoResults))
-        #     print(len(self.questions))
-        #     # Send the final results only when all data is ready
-        #     if len(self.videoResults) == len(self.questions):
-        #         print("Inside second for loop")
-        #         self.send(text_data=json.dumps({'FinalResult': self.videoResults}))
-
- 
-
+   
 
 
 
@@ -95,7 +81,7 @@ class InterviewConsumer(WebsocketConsumer):
 
             print(len(self.videoResults))
             print(len(self.questions))
-            if len(self.videoResults) == len(self.questions):
+            if len(self.videoResults) >= len(self.questions):
                 print("Inside second for loop")
                 self.send(text_data=json.dumps({'FinalResult': self.videoResults}))
 
@@ -115,6 +101,10 @@ class InterviewConsumer(WebsocketConsumer):
 
 
     def disconnect(self, close_code):
+        self.videoResults = []
+        self.questions = []
+        print(len(self.videoResults))
+        print(len(self.questions))
         if len(self.videoResults) != len(self.questions):
             print("Waiting for all results to be received before disconnecting.")
         else:
