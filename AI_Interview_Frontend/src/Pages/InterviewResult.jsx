@@ -34,7 +34,7 @@ const InterviewResult = () => {
                         className="bg-white shadow-md rounded-lg p-6 mb-4 w-full max-w-lg"
                     >
                         <h1 className="text-4xl font-bold mb-6 text-cyan-800">
-                            Question {index + 1}
+                            Question {index + 1} : { item.Original_Ques }
                         </h1>
                         <h3 className="font-semibold mt-2 text-xl text-gray-800">
                             Top Three Emotions:

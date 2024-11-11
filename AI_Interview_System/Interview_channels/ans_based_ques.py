@@ -18,7 +18,7 @@ class EvaluationInput(BaseModel):
 # Prompt Template
 evaluation_prompt = PromptTemplate.from_template(
     """
-    You are an experienced hiring manager with expertise in evaluating candidate responses during technical interviews.
+    You are an experienced hiring manager with expertise in generating a new question based on candidate response for previous question during technical interviews.
 
     Question:
     {question}
@@ -27,17 +27,11 @@ evaluation_prompt = PromptTemplate.from_template(
     {candidate_answer}
 
     Your task is to:
-    1. Provide an expected ideal response to the above question in short.
-    2. Assess the candidate's answer and assign a relevancy score between 0 to 5, where 0 indicates no relevance and 5 indicates high relevance.
-
+    1. Provide a new question to ask candidate
+     
     Please format your response as follows:
 
-    Relevancy Score:
-    <score>
-    
-    Expected Response:
-    <expected_response>
-
+    Question 1:
     
     """
 )
@@ -50,7 +44,7 @@ def format_input_for_prompt(input_data: EvaluationInput):
     )
 
 # Evaluation Function
-def evaluate(input_data: EvaluationInput):
+def ans_based_ques(input_data: EvaluationInput):
     formatted_query = format_input_for_prompt(input_data)
     result = chat.invoke(formatted_query)  # Invoking the model
     return result.content  # Accessing the 'content' attribute of the AIMessage object
@@ -64,5 +58,5 @@ if __name__ == "__main__":
     )
     
     # Evaluate candidate's answer
-    evaluation_result = evaluate(input_data)
-    print("evaluation_result is --------",evaluation_result)
+    evaluation_result = ans_based_ques(input_data)
+    print(evaluation_result)

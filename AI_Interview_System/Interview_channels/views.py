@@ -81,6 +81,7 @@ from rest_framework import status
 from moviepy.editor import VideoFileClip
 import speech_recognition as sr
 from .assessment_ans import evaluate, EvaluationInput
+from .ans_based_ques import ans_based_ques
 
 
 
@@ -104,9 +105,7 @@ class VideoUploadView(APIView):
     def post(self, request):
         video_file = request.FILES.get('video')
         Clientquestion = request.POST.get('question')
-        print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-        print("Question reveived form client is ",Clientquestion)
-
+         
         if video_file:
             # Define file paths
             webm_file_path = os.path.join('media/videos', video_file.name)
@@ -156,13 +155,13 @@ class VideoUploadView(APIView):
             # Initialize evaluation_result
             evaluation = None
             try:
-                evaluation = evaluate(input_data)
-                print("Eval res ",evaluation)
+                evaluation = evaluate(input_data) 
             except Exception as e:
                 return Response({"error": f"Evaluation failed: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
             # Create the response dictionary
             result_dict = {
+                "Original_Ques": Clientquestion,
                 "audio": audio_text,
                 "video": response.json() if response.status_code == 200 else {},
                 "evaluation_result": evaluation

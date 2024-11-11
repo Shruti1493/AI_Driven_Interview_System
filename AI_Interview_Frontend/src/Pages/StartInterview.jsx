@@ -15,11 +15,14 @@ const StartInterview = () => {
     const [proceedButton, setProceedButton] = useState(false);
     const [showScreen, setShowScreen] = useState(false);
     const [spokenWords, setSpokenWords] = useState("");
+    const [userans, setuserans] = useState("");
     const [apiresult, setApiResult] = useState(null);
     const [finalResult, setFinalResult] = useState(null);
     const [audioEnabled, setAudioEnabled] = useState(false);
     const [videoEnabled, setVideoEnabled] = useState(false);
     const [endLoader, setEndLoader] = useState(false);
+    const recognitionRef = useRef(null);
+    const [isRecording, setIsRecording] = useState(false);
     const videoRecorderRef = useRef(null);
     const navigate = useNavigate();
     const location = useLocation();
@@ -72,6 +75,57 @@ const StartInterview = () => {
             }
         };
     }, []);
+    const initializeSpeechRecognition = () => {
+        if (!("webkitSpeechRecognition" in window)) {
+            console.error("Speech Recognition not supported in this browser.");
+            return;
+        }
+        
+        const recognition = new window.webkitSpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = "en-US";
+        
+        recognition.onresult = (event) => {
+            const transcript = Array.from(event.results)
+                .map(result => result[0])
+                .map(result => result.transcript)
+                .join('');
+            setuserans(transcript);
+            
+             
+        };
+
+        recognition.onerror = (event) => {
+            console.error("Speech recognition error:", event.error);
+        };
+
+        recognitionRef.current = recognition;
+    };
+
+
+    const startSpeechRecognition = () => {
+        if (recognitionRef.current) {
+            recognitionRef.current.start();
+            console.log("Speech recognition started");
+        }
+    };
+
+    const stopSpeechRecognition = () => {
+        if (recognitionRef.current) {
+            recognitionRef.current.stop();
+            console.log("Speech recognition stopped");
+        }
+    };
+
+    useEffect(() => {
+        initializeSpeechRecognition();
+
+        return () => {
+            stopSpeechRecognition();
+        };
+    }, []);
+
 
     useEffect(() => {
         // Function to check if audio and video are enabled
@@ -161,9 +215,11 @@ const StartInterview = () => {
     }, [question]);
 
     const handleNextButton = () => {
+        setIsRecording(false);
+        stopSpeechRecognition();
         if (ws.current && ws.current.readyState === WebSocket.OPEN) {
             ws.current.send(
-                JSON.stringify({ client_mess: "Send Next Question pls" })
+                JSON.stringify({ client_mess: "Send Next Question pls", client_ques: question, client_ans: userans })
             );
         }
         if (videoRecorderRef.current) {
@@ -180,6 +236,8 @@ const StartInterview = () => {
     };
 
     const handleStartRecording = () => {
+        setIsRecording(true);
+        startSpeechRecognition();
         if (videoRecorderRef.current) {
             videoRecorderRef.current.startRecording();
         }
@@ -199,6 +257,7 @@ const StartInterview = () => {
     };
 
     const UploadResult = async (data) => {
+        console.log("Upload Resylt   ",data)
         if (data) {
             if (ws.current && ws.current.readyState === WebSocket.OPEN) {
                 ws.current.send(JSON.stringify({ result: data }));
@@ -206,6 +265,7 @@ const StartInterview = () => {
         }
     };
     useEffect(() => {
+        console.log("Api response use effect ")
         if (apiresult) {
             UploadResult(apiresult);
         }
