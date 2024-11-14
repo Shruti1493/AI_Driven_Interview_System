@@ -31,7 +31,7 @@ evaluation_prompt = PromptTemplate.from_template(
      
     Please format your response as follows:
 
-    Question 1:
+    Question:
     
     """
 )

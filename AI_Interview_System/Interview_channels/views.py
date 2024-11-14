@@ -139,8 +139,11 @@ class VideoUploadView(APIView):
             # Send the MP4 video to another service
             with open(mp4_file_path, 'rb') as mp4_file:
                 files = {'file': mp4_file}
-                response = requests.post("http://127.0.0.1:8002/upload_video/", files=files)
+                data = {'ques': Clientquestion}
+                response = requests.post("http://127.0.0.1:8002/upload_video/", files=files, data=data)
 
+
+                
             
 
             # Create the input data for evaluation
