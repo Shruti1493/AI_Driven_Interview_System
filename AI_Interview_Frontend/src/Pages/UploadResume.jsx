@@ -11,6 +11,7 @@ function UploadResume() {
     const [resumeData, setResumeData] = useState(null);
     const [uploadPressed, setUploadPressed] = useState(false);
     const [uploadFile, setUploadFile] = useState(false);
+    const [skillsLevel, setSkillsLevel] = useState({});
     const navigate = useNavigate();
 
     const handleFileChange = (e) => {
@@ -44,7 +45,7 @@ function UploadResume() {
 
         const formData = new FormData();
         formData.append("resume", resume);
-
+         
         try {
             const response = await axios.post(
                 "http://127.0.0.1:8000/resume/parse/",
@@ -56,6 +57,18 @@ function UploadResume() {
                 }
             );
             setResumeData(response.data);
+            console.log("Skills are ", response.data["skills"]);
+
+            if (response.data && response.data["skills"]) {
+                const skillsList = response.data["skills"];
+                for (const val of skillsList) {
+                    console.log("Skills for loop ", val);
+                    setSkillsLevel((prevskillsLevel) => ({
+                        ...prevskillsLevel,
+                        [val]: "Beginner",
+                    }));
+                }
+            }
         } catch (err) {
             console.error("Error uploading resume:", err);
             setError("Failed to upload resume. Please try again.");
@@ -67,9 +80,14 @@ function UploadResume() {
     const handleNextButton = () => {
         console.log("Button file path ", resumeData["file_path"]);
 
-        navigate("/start", { state: { file_path: resumeData["file_path"] } });
+        navigate("/start", { state: { file_path: resumeData["file_path"], Skills: skillsLevel } });
         //   navigate("/start", { state: { file_path: "C:\\Users\\91937\\Desktop\\Major_Project_MONGODB\\AI_Interview_System\\Uploaded_resumes\\Shruti Kedari SDE_wUm2xkm.pdf" } });
     };
+
+    useEffect(() => {
+        console.log("Current skillsLevel state:", skillsLevel);
+    }, [skillsLevel]); // Dependency array includes skillsLevel to trigger on updates
+
     return (
         <div>
             <div className="max-w-lg mx-auto">
@@ -172,6 +190,7 @@ function UploadResume() {
                                             Proceed for the interview
                                         </Button>
                                     )}
+                                   <div></div>
                                     <div className="p-4">
                                         <p className="flex items-center mb-2">
                                             <i className="fa fa-briefcase mr-2 text-teal-500"></i>
@@ -209,34 +228,60 @@ function UploadResume() {
                                             <i className="fa fa-asterisk mr-2 text-teal-500"></i>{" "}
                                             Skills
                                         </p>
-                                      
-                                        {resumeData &&
-                                        resumeData.skills &&
-                                        resumeData.skills.length > 0 ? (
-                                            resumeData.skills.map(
-                                                (skill, index) => (
-                                                    <div key={index}>
-                                                        {" "}
-                                                        {/* Use skill.id if available */}
-                                                        <p>{skill}</p>
-                                                        <div className="bg-gray-200 rounded-full h-4 mb-2">
-                                                            <div
-                                                                className="bg-teal-500 h-4 rounded-full text-center text-white text-sm"
-                                                                style={{
-                                                                    width: "90%",
-                                                                }}
-                                                            >
-                                                                90%
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                )
-                                            )
-                                        ) : (
-                                            <p className="text-gray-700">
-                                                No skills details provided.
-                                            </p>
-                                        )}
+ 
+
+
+                                                        
+                                    
+                {skillsLevel &&
+                    Object.keys(skillsLevel).length > 0 && (
+                        <div className="pl-4 pr-3">
+                            {Object.entries(skillsLevel).map(([skill, level]) => {
+                                // Convert the level to numeric value for range input
+                                const numericLevel = level === "Beginner" ? 30 : level === "Intermediate" ? 70 : 100;
+
+                                return (
+                                    <div key={skill}>
+                                        <p className="pl-4">
+                                            {skill} : {level}
+                                        </p>
+
+                                        <input
+                                            type="range"
+                                            min="1"
+                                            max="100"
+                                            value={numericLevel} // Set value as numeric level
+                                            onChange={(e) => {
+                                                const newLevel = parseInt(e.target.value, 10); // Get the new numeric value
+                                                let newSkillLevel;
+
+                                                // Map the numeric value back to string levels
+                                                if (newLevel <= 30) {
+                                                    newSkillLevel = "Beginner";
+                                                } else if (newLevel <= 70) {
+                                                    newSkillLevel = "Intermediate";
+                                                } else {
+                                                    newSkillLevel = "Advanced";
+                                                }
+
+                                                setSkillsLevel((prevSkills) => ({
+                                                    ...prevSkills,
+                                                    [skill]: newSkillLevel,
+                                                }));
+
+                                                console.log(`Updated ${skill} to level: ${newSkillLevel}`);
+                                            }}
+                                            className={`w-full h-2 rounded-lg appearance-none cursor-pointer ${
+                                                numericLevel < 30 ? "bg-teal-300" : numericLevel < 70 ? "bg-teal-500" : "bg-teal-700"
+                                            }`}
+                                        />
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
+
+                                
                                     </div>
                                 </div>
                             </div>
@@ -333,3 +378,4 @@ function UploadResume() {
 }
 
 export default UploadResume;
+ 

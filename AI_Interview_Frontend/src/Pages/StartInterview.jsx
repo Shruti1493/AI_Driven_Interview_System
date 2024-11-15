@@ -159,7 +159,7 @@ const StartInterview = () => {
         if (location.state) {
             console.log(location.state?.file_path);
             ws.current.send(
-                JSON.stringify({ resume: location.state?.file_path })
+                JSON.stringify({ resume: location.state?.file_path, Skills: location.state?.Skills })
             );
         }
     };

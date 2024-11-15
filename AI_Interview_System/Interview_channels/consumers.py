@@ -26,13 +26,15 @@ class InterviewConsumer(WebsocketConsumer):
 
     
 
-    def call_function_once(self, file_path):
+    def call_function_once(self, file_path, skillsLevel):
         self.flag = False
-        skills1={
-            "Python": "Intermediate",
-            "Django": "High",
-            "JavaScript": "Low"
-        }
+        # skills1={
+        #     "Python": "Intermediate",
+        #     "Django": "High",
+        #     "JavaScript": "Low"
+        # }
+        skills1 = skillsLevel
+        print("skills1 ",skills1)
         input_data = QueryInput(topic="Python", file=file_path, skills=skills1)
          
         ques = generateQuestions(input_data)
@@ -72,6 +74,7 @@ class InterviewConsumer(WebsocketConsumer):
         client_message = python_data.get('client_mess', '')
         upload_response = python_data.get('result', '')
         resume_path = python_data.get('resume', '')
+        skillsLevel = python_data.get('Skills',{})
         user_ans = python_data.get('client_ans', '')
         user_ques = python_data.get('client_ques', '')
 
@@ -86,7 +89,7 @@ class InterviewConsumer(WebsocketConsumer):
 
         # Handle resume upload and question generation
         if resume_path and self.function_called:
-            self.call_function_once(resume_path)
+            self.call_function_once(resume_path, skillsLevel)
             self.function_called = False
             self.flag = True  # Ready to send the first question
             self.send_next_question()
