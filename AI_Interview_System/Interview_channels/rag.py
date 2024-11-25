@@ -127,6 +127,8 @@ from pydantic import BaseModel
 import os
 import requests
 
+# from huggingface_hub import login
+# login()
 # Define the input query model to handle topic, file (resume), and skills with their levels
 class QueryInput(BaseModel):
     topic: str
@@ -215,19 +217,19 @@ def generateQuestions(input: QueryInput):
     return {"answer": result['answer']}
 
 
-# if __name__ == "__main__":
-#     input_data = QueryInput(
-#         topic="Python",
-#         file="C:/Users/91937/Desktop/Major_Project_MONGODB/AI_Interview_System/Interview_channels/Shruti_Kedari_SDE.pdf",  # Absolute path to the resume file
-        # skills={
-        #     "Python": "Intermediate",
-        #     "Django": "High",
-        #     "JavaScript": "Low"
-        # }
-#     )
+if __name__ == "__main__":
+    input_data = QueryInput(
+        topic="Python",
+        file="C:/Users/91937/Desktop/Major_Project_MONGODB/AI_Interview_System/Interview_channels/Shruti Kedari SDE.pdf",  
+        skills={
+            "Python": "Intermediate",
+            "Django": "High",
+            "JavaScript": "Low"
+        }
+    )
 
-#     # Generate questions based on the input data
-#     ques = generateQuestions(input_data)
-#     print(ques)
+    # Generate questions based on the input data
+    ques = generateQuestions(input_data)
+    print(ques)
 
 

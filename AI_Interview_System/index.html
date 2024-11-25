@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Streaming with Flask-SocketIO</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+        }
+        video, img {
+            border: 2px solid #333;
+            margin: 10px;
+            max-width: 90%;
+        }
+        #output {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #status {
+            margin-top: 15px;
+            font-size: 20px;
+            color: #333;
+            font-weight: bold;
+        }
+        h1 {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>Real-Time Video Processing</h1>
+    <div id="output">
+        <video id="video" autoplay muted></video>
+        <canvas id="canvas" style="display:none;"></canvas>
+        
+        <div id="status">Waiting for status...</div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.5.1/socket.io.min.js"></script>
+    <script>
+        const videoElement = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const processedFrame = document.getElementById('processed-frame');
+        const statusElement = document.getElementById('status');
+        const socket = io('http://127.0.0.1:5000'); // Ensure this matches your backend server URL
+
+        // Start video stream
+        async function startVideoStream() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                videoElement.srcObject = stream;
+            } catch (error) {
+                console.error('Error accessing webcam:', error);
+                statusElement.textContent = 'Error accessing webcam';
+            }
+        }
+
+        // Capture frames and send to backend
+        function sendFrame() {
+            const context = canvas.getContext('2d');
+            canvas.width = videoElement.videoWidth;
+            canvas.height = videoElement.videoHeight;
+
+            context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+            const frame = canvas.toDataURL('image/jpeg'); // Convert to base64
+            const binaryFrame = frame.split(',')[1]; // Remove the data URL prefix
+
+            socket.emit('video_frame', { frame: binaryFrame }); 
+        }
+
+        // Handle receiving processed frames and status messages from backend
+        socket.on('video_status', (data) => {
+            statusElement.textContent = data.message; // Update status message
+        });
+
+        socket.on('video_frame', (data) => {
+            processedFrame.src = `data:image/jpeg;base64,${data.frame}`;
+        });
+
+        // Start the video stream and send frames
+        videoElement.addEventListener('loadeddata', () => {
+            setInterval(sendFrame, 30); // Send frames every 30ms
+        });
+
+        startVideoStream();
+    </script>
+</body>
+</html>
