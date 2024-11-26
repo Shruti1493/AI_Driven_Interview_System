@@ -63,6 +63,11 @@ const StartInterview = () => {
                     ws.current.close();
                 }, 2000);
             }
+            if (jsObjQuestion["end"]) {
+                handleEndingLoader();
+                setIsRecording(false); // Stop recording
+                stopSpeechRecognition(); // Stop speech recognition
+            }
         };
 
         ws.current.onclose = () => {
@@ -234,26 +239,35 @@ const StartInterview = () => {
     };
 
     const handleFinishButton = () => {
-        // handleNextButton();
-        setIsRecording(false);
+        if (videoRecorderRef.current) {
+            // Stop the current recording and upload it
+            videoRecorderRef.current.stopAndUpload(question);
+            setStartVideo(false);
+        }
 
-        setEndLoader(true);
-        stopSpeechRecognition();
+        setIsRecording(false); // Stop recording
+        stopSpeechRecognition(); // Stop speech recognition
+
+        // Handle loader after a delay
+        handleEndingLoader();
+
+        // Send STOP Interview message if WebSocket is open
         if (ws.current && ws.current.readyState === WebSocket.OPEN) {
             ws.current.send(
                 JSON.stringify({
-                    client_mess: "Send Next Question pls",
+                    stop: "STOP Interview",
                     client_ques: question,
                     client_ans: userans,
                 })
             );
         }
-        if (videoRecorderRef.current) {
-            // Stop the current recording and upload it
-            videoRecorderRef.current.stopAndUpload(question);
+    };
 
-            setStartVideo(false);
-        }
+    const handleEndingLoader = () => {
+        // Delay setting the loader using setTimeout
+        setTimeout(() => {
+            setEndLoader(true);
+        }, 2000); // 10 seconds
     };
 
     const handleStartRecording = () => {
@@ -494,18 +508,16 @@ const StartInterview = () => {
                     </div>
                 )}
 
-                    <div >
-                        
-                        {!startTimer && question && !endLoader && (
-                            <div className="mt-2 bg-white rounded-lg shadow-md p-2 w-full max-w-xl">
-                                <VideoRecorder
-                                    ref={videoRecorderRef}
-                                    func={SendResult}
-                                />
-                            </div>
-                        )}
-                    </div>
-              
+                <div>
+                    {!startTimer && question && !endLoader && (
+                        <div className="mt-2 bg-white rounded-lg shadow-md p-2 w-full max-w-xl">
+                            <VideoRecorder
+                                ref={videoRecorderRef}
+                                func={SendResult}
+                            />
+                        </div>
+                    )}
+                </div>
             </div>
         </>
     );
