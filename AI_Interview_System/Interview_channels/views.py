@@ -68,7 +68,7 @@ class RAGAPIView(APIView):
 
 
 
-
+import re
 
 
 
@@ -82,6 +82,7 @@ from moviepy.editor import VideoFileClip
 import speech_recognition as sr
 from .assessment_ans import evaluate, EvaluationInput
 from .ans_based_ques import ans_based_ques
+from .audio import run_quickstart
 
 
 
@@ -132,6 +133,10 @@ class VideoUploadView(APIView):
             output_audio_file = "outputnew.wav"
             convert_video_to_audio_moviepy(mp4_file_path, output_audio_file)
             audio_text = convert_audio_to_text(output_audio_file)
+            print("Inside views.py frunction")
+        
+            print("+++++++++++++++++++++++++++++++++++++++++++")
+
 
             # Clean up the audio file after extraction
             os.remove(output_audio_file)
@@ -156,18 +161,33 @@ class VideoUploadView(APIView):
             )
 
             # Initialize evaluation_result
+            score = 0
             evaluation = None
             try:
                 evaluation = evaluate(input_data) 
+                
+                
             except Exception as e:
                 return Response({"error": f"Evaluation failed: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+            match = re.search(r"Relevancy Score:\s*(\d+)", evaluation)
+            if match:
+                relevancy_score = int(match.group(1))
+                score = relevancy_score
+                print("Relevancy Score:", relevancy_score)
+            else:
+                relevancy_score = 0
+                print("Relevancy Score not found")
+
 
             # Create the response dictionary
             result_dict = {
                 "Original_Ques": Clientquestion,
                 "audio": audio_text,
                 "video": response.json() if response.status_code == 200 else {},
-                "evaluation_result": evaluation
+                "evaluation_result": evaluation,
+                "Relevancy_Score": score
             }
 
 

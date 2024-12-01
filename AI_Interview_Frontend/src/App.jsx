@@ -106,7 +106,7 @@ function App() {
                 </section>
 
                 {/* Testimonials Section */}
-                <section id="testimonials" className="bg-gray-50 py-16">
+                <section id="testimonials" className="bg-cyan-800 py-16">
                     <div className="max-w-7xl mx-auto px-4">
                         <h2 className="text-3xl font-bold text-center mb-8">
                             What Our Users Say
@@ -140,68 +140,7 @@ function App() {
                     </div>
                 </section>
 
-                {/* Pricing Section */}
-                <section id="pricing" className="bg-cyan-800 text-white py-16">
-                    <div className="max-w-7xl mx-auto px-4">
-                        <h2 className="text-3xl font-bold text-center mb-8">
-                            Pricing Plans
-                        </h2>
-                        <div className="flex flex-col md:flex-row md:space-x-8">
-                            <div className="flex-1 bg-gray-700 p-6 rounded-lg shadow-lg mb-6 md:mb-0">
-                                <h3 className="text-2xl font-semibold mb-4">
-                                    Basic Plan
-                                </h3>
-                                <p className="text-lg mb-4">$19/month</p>
-                                <ul className="list-disc list-inside mb-4">
-                                    <li>Access to basic mock interviews</li>
-                                    <li>Standard feedback and tips</li>
-                                    <li>Email support</li>
-                                </ul>
-                                <a
-                                    href="#"
-                                    className="bg-yellow-500 text-gray-800 px-6 py-3 rounded-lg font-semibold hover:bg-yellow-600 transition duration-300"
-                                >
-                                    Choose Plan
-                                </a>
-                            </div>
-                            <div className="flex-1 bg-gray-700 p-6 rounded-lg shadow-lg mb-6 md:mb-0">
-                                <h3 className="text-2xl font-semibold mb-4">
-                                    Professional Plan
-                                </h3>
-                                <p className="text-lg mb-4">$49/month</p>
-                                <ul className="list-disc list-inside mb-4">
-                                    <li>All features of Basic Plan</li>
-                                    <li>Advanced mock interviews</li>
-                                    <li>Personalized coaching sessions</li>
-                                </ul>
-                                <a
-                                    href="#"
-                                    className="bg-yellow-500 text-gray-800 px-6 py-3 rounded-lg font-semibold hover:bg-yellow-600 transition duration-300"
-                                >
-                                    Choose Plan
-                                </a>
-                            </div>
-                            <div className="flex-1 bg-gray-700 p-6 rounded-lg shadow-lg">
-                                <h3 className="text-2xl font-semibold mb-4">
-                                    Enterprise Plan
-                                </h3>
-                                <p className="text-lg mb-4">Contact Us</p>
-                                <ul className="list-disc list-inside mb-4">
-                                    <li>All features of Professional Plan</li>
-                                    <li>Customizable mock interviews</li>
-                                    <li>Dedicated account manager</li>
-                                    <li>Priority support</li>
-                                </ul>
-                                <a
-                                    href="#"
-                                    className="bg-yellow-500 text-gray-800 px-6 py-3 rounded-lg font-semibold hover:bg-yellow-600 transition duration-300"
-                                >
-                                    Contact Us
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </section>
+                
 
                 {/* Blog Section */}
                 <section id="blog" className="bg-gray-50 py-16">
