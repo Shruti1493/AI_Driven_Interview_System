@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 const TImer = (props) => {
-    const [timeLeft, setTimeLeft] = useState(1); // Set your desired countdown time here
+    const [timeLeft, setTimeLeft] = useState(10); // Set your desired countdown time here
     const [timerActive, setTimerActive] = useState(true);
 
     useEffect(() => {

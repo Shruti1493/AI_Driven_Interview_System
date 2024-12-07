@@ -4,6 +4,8 @@ import TImer from "../Components/InterviewComponents/TImer";
 import VideoRecorder from "../Components/InterviewComponents/VideoRecorder";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
+import { WEBSOCKET_BASE_URL,WEBSOCKET_PATH } from "../config";
+
 
 const StartInterview = () => {
     const ws = useRef(null);
@@ -26,9 +28,10 @@ const StartInterview = () => {
     const videoRecorderRef = useRef(null);
     const navigate = useNavigate();
     const location = useLocation();
+    
     // const [file_p, setfile_p] = useState(location.state?.file_path || []);
 
-    const WebSocketUrl = "ws://127.0.0.1:8000/ws/sc/";
+    // const WebSocketUrl = "ws://127.0.0.1:8000/ws/sc/";
     const handleCheckboxChange = (e) => {
         setIsChecked(e.target.checked);
     };
@@ -36,7 +39,10 @@ const StartInterview = () => {
     useEffect(() => {
         console.log("Connecting to WebSocket...");
 
-        ws.current = new WebSocket(WebSocketUrl);
+        const wsUrl = `${WEBSOCKET_BASE_URL}${WEBSOCKET_PATH}`;
+        console.log("Connecting to WebSocket:", wsUrl);
+
+        ws.current = new WebSocket(wsUrl);
 
         ws.current.onopen = () => {
             console.log("Connection established");

@@ -3,75 +3,10 @@ import requests
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import QueryInputSerializer  # Import your serializer
+from .serializers import QueryInputSerializer   
 
-class RAGAPIView(APIView):
-    def post(self, request):
-        # Validate the incoming data using the serializer
-        serializer = QueryInputSerializer(data=request.data)
-
-        if serializer.is_valid():
-            topic = serializer.validated_data['topic']
-
-            # FastAPI endpoint URL
-            fastapi_url = 'http://localhost:8001/rag'  # Ensure this matches your FastAPI setup
-            payload = {'topic': topic}
-
-            try:
-                # Make a POST request to the FastAPI endpoint
-                response = requests.post(fastapi_url, json=payload)
-                response.raise_for_status()  # Check if the request was successful
-
-                # Get the 'answer' from the response
-                answer = response.json().get('answer', '')
-                questions = []
-
-                if answer:
-                    # Split the answer string by newline character and strip extra whitespace
-                    questions = [q.strip() for q in answer.split('\n') if q.strip()]
-
-                print("Extracted Questions:", questions)  # Debug print
-
-                return Response({'questions': questions, 'previous': answer}, status=status.HTTP_200_OK)
-
-            except requests.exceptions.RequestException as e:
-                # Handle request errors
-                return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        # If serializer validation fails, return error response
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+   
 import re
-
-
-
 import os
 import subprocess
 import requests
@@ -83,7 +18,9 @@ import speech_recognition as sr
 from .assessment_ans import evaluate, EvaluationInput
 from .ans_based_ques import ans_based_ques
 from .audio import run_quickstart
-
+from django.conf import settings
+from .StaticUrl import UPLOAD_VIDEO_URL
+# UPLOAD_VIDEO_URL = settings.UPLOAD_VIDEO_URL
 
 
 def convert_video_to_audio_moviepy(video_file, output_file):
@@ -104,6 +41,8 @@ def convert_audio_to_text(audio_file):
 
 class VideoUploadView(APIView):
     def post(self, request):
+        print("Upload video url",UPLOAD_VIDEO_URL)
+
         video_file = request.FILES.get('video')
         Clientquestion = request.POST.get('question')
          
@@ -145,7 +84,9 @@ class VideoUploadView(APIView):
             with open(mp4_file_path, 'rb') as mp4_file:
                 files = {'file': mp4_file}
                 data = {'ques': Clientquestion}
-                response = requests.post("http://127.0.0.1:8002/upload_video/", files=files, data=data)
+                # response = requests.post("http://127.0.0.1:8002/upload_video/", files=files, data=data)
+                response = requests.post(UPLOAD_VIDEO_URL + "upload_video/", files=files, data=data)
+
 
 
                 

@@ -7,6 +7,8 @@ import React, {
 } from "react";
 import { useReactMediaRecorder } from "react-media-recorder";
 import io from "socket.io-client";
+import { VIDEO_PATH, API_BASE_URL,SOCKET_IO_BASEPATH } from "../../config.js"
+
 
 const VideoRecorder = forwardRef((props, ref) => {
     const [recordingStatus, setRecordingStatus] = useState(null);
@@ -72,7 +74,7 @@ const VideoRecorder = forwardRef((props, ref) => {
             console.log(
                 "Answer recording started, establishing WebSocket connection..."
             ); // Debug statement
-            const newSocket = io("http://127.0.0.1:5000");
+            const newSocket = io(SOCKET_IO_BASEPATH);
             setSocket(newSocket);
 
             const sendFrame = () => {
@@ -143,10 +145,11 @@ const VideoRecorder = forwardRef((props, ref) => {
             const formData = new FormData();
             formData.append("video", videoBlob, fileName);
             formData.append("question", question);
+            const urlVideo = `${API_BASE_URL}${VIDEO_PATH}`
             try {
                 console.log("Sending video to backend..."); // Debug statement
                 const response = await fetch(
-                    "http://localhost:8000/interview/upload_video/",
+                    urlVideo,
                     {
                         method: "POST",
                         body: formData,

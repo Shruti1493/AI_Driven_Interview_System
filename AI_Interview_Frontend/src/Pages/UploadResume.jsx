@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Button } from "@material-tailwind/react";
+import { RESUME_PARSE_PATH, API_BASE_URL } from "../config";
 
 import { useNavigate } from "react-router-dom";
 
@@ -44,18 +45,15 @@ function UploadResume() {
         }
 
         const formData = new FormData();
+
         formData.append("resume", resume);
-         
+        const url = `${API_BASE_URL}${RESUME_PARSE_PATH}`;
         try {
-            const response = await axios.post(
-                "http://127.0.0.1:8000/resume/parse/",
-                formData,
-                {
-                    headers: {
-                        "Content-Type": "multipart/form-data",
-                    },
-                }
-            );
+            const response = await axios.post(url, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
             setResumeData(response.data);
             console.log("Skills are ", response.data["skills"]);
 
@@ -80,7 +78,9 @@ function UploadResume() {
     const handleNextButton = () => {
         console.log("Button file path ", resumeData["file_path"]);
 
-        navigate("/start", { state: { file_path: resumeData["file_path"], Skills: skillsLevel } });
+        navigate("/start", {
+            state: { file_path: resumeData["file_path"], Skills: skillsLevel },
+        });
         //   navigate("/start", { state: { file_path: "C:\\Users\\91937\\Desktop\\Major_Project_MONGODB\\AI_Interview_System\\Uploaded_resumes\\Shruti Kedari SDE_wUm2xkm.pdf" } });
     };
 
@@ -190,7 +190,7 @@ function UploadResume() {
                                             Proceed for the interview
                                         </Button>
                                     )}
-                                   <div></div>
+                                    <div></div>
                                     <div className="p-4">
                                         <p className="flex items-center mb-2">
                                             <i className="fa fa-briefcase mr-2 text-teal-500"></i>
@@ -228,60 +228,96 @@ function UploadResume() {
                                             <i className="fa fa-asterisk mr-2 text-teal-500"></i>{" "}
                                             Skills
                                         </p>
- 
 
+                                        {skillsLevel &&
+                                            Object.keys(skillsLevel).length >
+                                                0 && (
+                                                <div className="pl-4 pr-3">
+                                                    {Object.entries(
+                                                        skillsLevel
+                                                    ).map(([skill, level]) => {
+                                                        // Convert the level to numeric value for range input
+                                                        const numericLevel =
+                                                            level === "Beginner"
+                                                                ? 30
+                                                                : level ===
+                                                                  "Intermediate"
+                                                                ? 70
+                                                                : 100;
 
-                                                        
-                                    
-                {skillsLevel &&
-                    Object.keys(skillsLevel).length > 0 && (
-                        <div className="pl-4 pr-3">
-                            {Object.entries(skillsLevel).map(([skill, level]) => {
-                                // Convert the level to numeric value for range input
-                                const numericLevel = level === "Beginner" ? 30 : level === "Intermediate" ? 70 : 100;
+                                                        return (
+                                                            <div key={skill}>
+                                                                <p className="pl-4">
+                                                                    {skill} :{" "}
+                                                                    {level}
+                                                                </p>
 
-                                return (
-                                    <div key={skill}>
-                                        <p className="pl-4">
-                                            {skill} : {level}
-                                        </p>
+                                                                <input
+                                                                    type="range"
+                                                                    min="1"
+                                                                    max="100"
+                                                                    value={
+                                                                        numericLevel
+                                                                    } // Set value as numeric level
+                                                                    onChange={(
+                                                                        e
+                                                                    ) => {
+                                                                        const newLevel =
+                                                                            parseInt(
+                                                                                e
+                                                                                    .target
+                                                                                    .value,
+                                                                                10
+                                                                            ); // Get the new numeric value
+                                                                        let newSkillLevel;
 
-                                        <input
-                                            type="range"
-                                            min="1"
-                                            max="100"
-                                            value={numericLevel} // Set value as numeric level
-                                            onChange={(e) => {
-                                                const newLevel = parseInt(e.target.value, 10); // Get the new numeric value
-                                                let newSkillLevel;
+                                                                        // Map the numeric value back to string levels
+                                                                        if (
+                                                                            newLevel <=
+                                                                            30
+                                                                        ) {
+                                                                            newSkillLevel =
+                                                                                "Beginner";
+                                                                        } else if (
+                                                                            newLevel <=
+                                                                            70
+                                                                        ) {
+                                                                            newSkillLevel =
+                                                                                "Intermediate";
+                                                                        } else {
+                                                                            newSkillLevel =
+                                                                                "Advanced";
+                                                                        }
 
-                                                // Map the numeric value back to string levels
-                                                if (newLevel <= 30) {
-                                                    newSkillLevel = "Beginner";
-                                                } else if (newLevel <= 70) {
-                                                    newSkillLevel = "Intermediate";
-                                                } else {
-                                                    newSkillLevel = "Advanced";
-                                                }
+                                                                        setSkillsLevel(
+                                                                            (
+                                                                                prevSkills
+                                                                            ) => ({
+                                                                                ...prevSkills,
+                                                                                [skill]:
+                                                                                    newSkillLevel,
+                                                                            })
+                                                                        );
 
-                                                setSkillsLevel((prevSkills) => ({
-                                                    ...prevSkills,
-                                                    [skill]: newSkillLevel,
-                                                }));
-
-                                                console.log(`Updated ${skill} to level: ${newSkillLevel}`);
-                                            }}
-                                            className={`w-full h-2 rounded-lg appearance-none cursor-pointer ${
-                                                numericLevel < 30 ? "bg-teal-300" : numericLevel < 70 ? "bg-teal-500" : "bg-teal-700"
-                                            }`}
-                                        />
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    )}
-
-                                
+                                                                        console.log(
+                                                                            `Updated ${skill} to level: ${newSkillLevel}`
+                                                                        );
+                                                                    }}
+                                                                    className={`w-full h-2 rounded-lg appearance-none cursor-pointer ${
+                                                                        numericLevel <
+                                                                        30
+                                                                            ? "bg-teal-300"
+                                                                            : numericLevel <
+                                                                              70
+                                                                            ? "bg-teal-500"
+                                                                            : "bg-teal-700"
+                                                                    }`}
+                                                                />
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            )}
                                     </div>
                                 </div>
                             </div>
@@ -378,4 +414,3 @@ function UploadResume() {
 }
 
 export default UploadResume;
- 
